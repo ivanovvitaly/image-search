@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PollyTest.Services
+namespace PollyTest
 {
     public class ImagesServiceConfig
     {

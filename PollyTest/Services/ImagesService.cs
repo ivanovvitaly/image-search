@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
+using PollyTest.Dto;
 
 namespace PollyTest.Services
 {
@@ -39,7 +40,7 @@ namespace PollyTest.Services
                   });
         }
 
-        public async Task<PicturesResponse> GetImages(int? page)
+        public async Task<PagedPictures> GetImages(int? page)
         {
             _logger.LogDebug($"{nameof(GetImages)} {{Page}}", page);
             var imagesUrl = "/images";
@@ -52,7 +53,7 @@ namespace PollyTest.Services
             var response = await _retryWithReauthorizationPolicy.ExecuteAsync(() => Http.GetAsync(imagesUrl));
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadFromJsonAsync<PicturesResponse>();
+            return await response.Content.ReadFromJsonAsync<PagedPictures>();
         }
 
         public async Task<PictureDetail> GetImage(string id)
@@ -95,11 +96,4 @@ namespace PollyTest.Services
 
         private record TokenRequest(string ApiKey);
     }
-
-    public record PicturesResponse(Picture[] Pictures, int Page, int PageCount, bool HasMore);
-
-    public record Picture(string Id, string Cropped_Picture);
-
-    public record PictureDetail(string Id, string Author, string Camera, string Tags, string Cropped_Picture, string
-    Full_Picture);
 }
