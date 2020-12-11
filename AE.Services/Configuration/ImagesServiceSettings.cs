@@ -8,6 +8,8 @@ namespace AE.Services.Configuration
 
         public string ApiKey { get; set; }
 
-        public TimeSpan CacheDuration { get; set; }
+        public int CacheDuration { get; set; }
+
+        public static int MinCacheDuration { get; } = 1;
     }
 }

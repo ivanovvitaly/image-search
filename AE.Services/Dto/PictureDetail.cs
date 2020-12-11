@@ -1,5 +1,4 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace AE.Services.Dto
 {
@@ -13,10 +12,10 @@ namespace AE.Services.Dto
         
         public string Tags { get; set; }
 
-        [JsonProperty("cropped_picture")]
+        [JsonPropertyName("cropped_picture")]
         public string CroppedPicture { get; set; }
 
-        [JsonProperty("full_picture")]
+        [JsonPropertyName("full_picture")]
         public string FullPicture { get; set; }
     }
 }

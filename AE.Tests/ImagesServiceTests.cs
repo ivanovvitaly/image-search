@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using AE.Services.Services;
 using AE.Services.Configuration;
+using AE.Services.Dto;
 
 namespace AE.Tests
 {
@@ -105,6 +107,25 @@ namespace AE.Tests
             var token = await imagesService.CreateAccessToken();
 
             Assert.That(token, Is.Not.Null);
+        }
+
+        [Test]
+        public void Search_SearchTerm_Picture()
+        {
+            var imagesCache = provider.GetService<IImagesServiceCache>();
+            imagesCache.Set(new List<PictureDetail>
+            {
+                new PictureDetail
+                {
+                    Author = "VItaly",
+                    Camera = "Nikkon"
+                }
+            });
+            var imagesService = provider.GetService<IImagesService>();
+            var images = imagesService.Search("ita");
+
+            Assert.That(images, Is.Not.Empty);
+            Assert.That(images.Length, Is.EqualTo(1));
         }
     }
 }

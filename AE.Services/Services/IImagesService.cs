@@ -10,5 +10,7 @@ namespace AE.Services.Services
         Task<PictureDetail> GetImage(string id);
 
         Task<string> CreateAccessToken();
+
+        PictureDetail[] Search(string term);
     }
 }

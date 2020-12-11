@@ -8,6 +8,6 @@ namespace AE.Services.Dto
         
         public int PageCount { get; set; }
 
-        public bool HasMorePictures { get; set; }
+        public bool HasMore { get; set; }
     }
 }

@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,6 +9,8 @@ using Polly;
 using Polly.Retry;
 using AE.Services.Dto;
 using AE.Services.Configuration;
+using System.Linq;
+using System.Net.Http.Json;
 
 namespace AE.Services.Services
 {
@@ -17,17 +18,20 @@ namespace AE.Services.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IOptions<ImagesServiceSettings> _serviceSettings;
+        private readonly IImagesServiceCache _imagesCache;
         private readonly ILogger<ImagesService> _logger;
-        private string _token = null;
+        private string _token;
         private readonly AsyncRetryPolicy<HttpResponseMessage> _authenticationPolicy;
 
         public ImagesService(
             HttpClient httpClient,
             IOptions<ImagesServiceSettings> serviceSettings,
+            IImagesServiceCache imagesCache,
             ILogger<ImagesService> logger)
         {
             _httpClient = httpClient;
             _serviceSettings = serviceSettings;
+            _imagesCache = imagesCache;
             _httpClient.BaseAddress = new Uri(_serviceSettings.Value.ApiBaseUrl);
 
             _logger = logger;
@@ -62,9 +66,12 @@ namespace AE.Services.Services
             _logger.LogDebug($"{nameof(GetImage)} {{Id}}.", id);
             var response = await _authenticationPolicy.ExecuteAsync(() => Http.GetAsync($"/images/{id}"));
 
-            return response.StatusCode == HttpStatusCode.OK
-                ? await response.Content.ReadFromJsonAsync<PictureDetail>()
-                : null;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return await response.Content.ReadFromJsonAsync<PictureDetail>();
+            }
+
+            return null;
         }
 
         public async Task<string> CreateAccessToken()
@@ -75,6 +82,19 @@ namespace AE.Services.Services
             var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
             _token = tokenResponse.Token;
             return _token;
+        }
+
+        public PictureDetail[] Search(string term)
+        {
+            return _imagesCache.Get().Where(picture =>
+            {
+                var searchableProperties = picture.GetType()
+                                                  .GetProperties()
+                                                  .Where(prop => prop.PropertyType == typeof(string));
+
+                return searchableProperties.Any(prop => ((string)prop.GetValue(picture) ?? "").Contains(term, StringComparison.OrdinalIgnoreCase));
+
+            }).ToArray();
         }
 
         private HttpClient Http

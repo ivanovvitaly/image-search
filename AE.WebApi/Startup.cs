@@ -21,6 +21,7 @@ namespace AE.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddImagesService(Configuration);
+            services.AddImagesCaching();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
