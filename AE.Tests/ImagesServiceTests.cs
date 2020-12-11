@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using PollyTest;
-using PollyTest.Services;
+using AE.Services.Services;
+using AE.Services.Configuration;
 
-namespace Tests
+namespace AE.Tests
 {
     [TestFixture]
     public class ImagesServiceTests
@@ -22,10 +22,9 @@ namespace Tests
                 .Build();
 
             var services = new ServiceCollection();
-            services.ConfigureService(configuration);
+            services.AddImagesService(configuration);
             provider = services.BuildServiceProvider();
         }
-
 
         [Test]
         public async Task GetImages_Success()

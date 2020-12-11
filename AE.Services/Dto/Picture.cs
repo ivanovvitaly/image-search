@@ -1,13 +1,13 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace PollyTest.Dto
+namespace AE.Services.Dto
 {
     public class Picture
     {
         public string Id { get; set; }
         
-        [JsonProperty(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
+        [JsonProperty("cropped_picture")]
         public string CroppedPicture { get; set; }
     }
 }

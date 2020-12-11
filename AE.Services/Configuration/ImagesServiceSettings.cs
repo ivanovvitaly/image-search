@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace PollyTest
+namespace AE.Services.Configuration
 {
-    public class ImagesServiceConfig
+    public class ImagesServiceSettings
     {
         public string ApiBaseUrl { get; set; }
 

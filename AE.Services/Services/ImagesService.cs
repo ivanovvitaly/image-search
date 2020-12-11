@@ -8,30 +8,31 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
-using PollyTest.Dto;
+using AE.Services.Dto;
+using AE.Services.Configuration;
 
-namespace PollyTest.Services
+namespace AE.Services.Services
 {
     public class ImagesService : IImagesService
     {
         private readonly HttpClient _httpClient;
-        private readonly IOptions<ImagesServiceConfig> _config;
+        private readonly IOptions<ImagesServiceSettings> _serviceSettings;
         private readonly ILogger<ImagesService> _logger;
         private string _token = null;
-        private readonly AsyncRetryPolicy<HttpResponseMessage> _retryWithReauthorizationPolicy;
+        private readonly AsyncRetryPolicy<HttpResponseMessage> _authenticationPolicy;
 
         public ImagesService(
             HttpClient httpClient,
-            IOptions<ImagesServiceConfig> config,
+            IOptions<ImagesServiceSettings> serviceSettings,
             ILogger<ImagesService> logger)
         {
             _httpClient = httpClient;
-            _config = config;
-            _httpClient.BaseAddress = new Uri(_config.Value.ApiBaseUrl);
+            _serviceSettings = serviceSettings;
+            _httpClient.BaseAddress = new Uri(_serviceSettings.Value.ApiBaseUrl);
 
             _logger = logger;
 
-            _retryWithReauthorizationPolicy = Policy
+            _authenticationPolicy = Policy
                   .HandleResult<HttpResponseMessage>(message => message.StatusCode == HttpStatusCode.Unauthorized)
                   .RetryAsync(1, async (result, retryCount, context) =>
                   {
@@ -50,7 +51,7 @@ namespace PollyTest.Services
                 imagesUrl += $"?page={page}";
             }
 
-            var response = await _retryWithReauthorizationPolicy.ExecuteAsync(() => Http.GetAsync(imagesUrl));
+            var response = await _authenticationPolicy.ExecuteAsync(() => Http.GetAsync(imagesUrl));
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<PagedPictures>();
@@ -59,7 +60,7 @@ namespace PollyTest.Services
         public async Task<PictureDetail> GetImage(string id)
         {
             _logger.LogDebug($"{nameof(GetImage)} {{Id}}.", id);
-            var response = await _retryWithReauthorizationPolicy.ExecuteAsync(() => Http.GetAsync($"/images/{id}"));
+            var response = await _authenticationPolicy.ExecuteAsync(() => Http.GetAsync($"/images/{id}"));
 
             return response.StatusCode == HttpStatusCode.OK
                 ? await response.Content.ReadFromJsonAsync<PictureDetail>()
@@ -68,7 +69,7 @@ namespace PollyTest.Services
 
         public async Task<string> CreateAccessToken()
         {
-            var response = await _httpClient.PostAsJsonAsync("/auth", new TokenRequest(_config.Value.ApiKey));
+            var response = await _httpClient.PostAsJsonAsync("/auth", new TokenRequest(_serviceSettings.Value.ApiKey));
             response.EnsureSuccessStatusCode();
 
             var tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>();
@@ -82,9 +83,7 @@ namespace PollyTest.Services
             {
                 if (!string.IsNullOrEmpty(_token))
                 {
-                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                        "Bearer",
-                        _token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
                 }
 
                 return _httpClient;

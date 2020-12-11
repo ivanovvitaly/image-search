@@ -1,4 +1,4 @@
-namespace PollyTest.Dto
+namespace AE.Services.Dto
 {
     public class PagedPictures
     {

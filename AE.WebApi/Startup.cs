@@ -1,14 +1,12 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using PollyTest.Services;
-using Serilog;
+using AE.Services.Configuration;
 
-namespace PollyTest
+namespace AE.WebApi
 {
     public class Startup
     {
@@ -22,11 +20,11 @@ namespace PollyTest
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureService(Configuration);
+            services.AddImagesService(Configuration);
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "PollyTest", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "AE.WebApi", Version = "v1" });
             });
         }
 
@@ -37,10 +35,9 @@ namespace PollyTest
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PollyTest v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AE.WebApi v1"));
             }
 
-            /*app.UseSerilogRequestLogging();*/
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using PollyTest.Dto;
+using AE.Services.Dto;
 
-namespace PollyTest.Services
+namespace AE.Services.Services
 {
     public interface IImagesService
     {

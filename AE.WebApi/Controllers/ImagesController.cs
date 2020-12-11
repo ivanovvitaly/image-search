@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace PollyTest.Controllers
+namespace AE.WebApi
 {
     [ApiController]
     [Route("[controller]")]
@@ -17,7 +17,6 @@ namespace PollyTest.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            _logger.LogDebug("1111111111111111111111111111111111111111111111111111");
             return Ok("hey");
         }
     }
