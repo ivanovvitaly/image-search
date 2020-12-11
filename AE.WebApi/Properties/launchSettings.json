@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "PollyTest": {
+    "AE.WebApi": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "applicationUrl": "http://localhost:5000",
