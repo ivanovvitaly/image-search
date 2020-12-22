@@ -32,8 +32,6 @@ namespace AE.Tests
         public async Task GetImages_Success()
         {
             var imagesService = provider.GetService<IImagesService>();
-            await imagesService.CreateAccessToken();
-
             var images = await imagesService.GetImages();
 
             Assert.That(images, Is.Not.Null);
@@ -46,8 +44,6 @@ namespace AE.Tests
         public async Task GetImagesAtPage_Success(int page)
         {
             var imagesService = provider.GetService<IImagesService>();
-            await imagesService.CreateAccessToken();
-
             var images = await imagesService.GetImages(page);
 
             Assert.That(images, Is.Not.Null);
@@ -67,7 +63,6 @@ namespace AE.Tests
         public async Task GetImageDetail_ValidId_ImageDetail()
         {
             var imagesService = provider.GetService<IImagesService>();
-            await imagesService.CreateAccessToken();
 
             var imageId = "be89995bc7886d5a7312";
             var detail = await imagesService.GetImage(imageId);
@@ -80,7 +75,6 @@ namespace AE.Tests
         public async Task GetImageDetail_InvalidValidId_Null()
         {
             var imagesService = provider.GetService<IImagesService>();
-            await imagesService.CreateAccessToken();
 
             var imageId = "asdasd";
             var detail = await imagesService.GetImage(imageId);
@@ -98,15 +92,6 @@ namespace AE.Tests
             Assert.That(images, Is.Not.Null);
             Assert.That(images.Pictures, Is.Not.Null);
             Assert.That(images.Pictures.Length, Is.GreaterThan(0));
-        }
-
-        [Test]
-        public async Task CreateAccessToken_TokenCreated()
-        {
-            var imagesService = provider.GetService<IImagesService>();
-            var token = await imagesService.CreateAccessToken();
-
-            Assert.That(token, Is.Not.Null);
         }
 
         [Test]
