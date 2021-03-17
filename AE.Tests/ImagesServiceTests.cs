@@ -59,7 +59,7 @@ namespace AE.Tests
             }
         }
 
-        [Test]
+        [Test, Ignore("Update valida id")]
         public async Task GetImageDetail_ValidId_ImageDetail()
         {
             var imagesService = provider.GetService<IImagesService>();
